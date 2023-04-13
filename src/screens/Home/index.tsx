@@ -14,17 +14,25 @@ import clipboard from "../../assets/Clipboard.png";
 import { Header } from "../../components/Header";
 import { Info } from "../../components/Info";
 import { styles } from "./styles";
+import { Task } from "../../components/Task";
 
 export function Home() {
-  const [tasks, setTasks] = useState<string[]>([]);
+  const [tasks, setTasks] = useState<string[]>(['batata']);
   const [taskDescription, setTaskDescription] = useState('')
+  const [doneCounter, setDoneCounter] = useState(0)
 
   const inputTextRef = useRef<TextInput>(null)
-  function handleCreateTask(){
+  function handleCreateTask() {
     setTasks(prevState => [...prevState, taskDescription])
     inputTextRef.current?.blur()
     setTaskDescription('')
-    
+
+  }
+
+  function handleDeleteTask(deletedTask: string) {
+    const filteredTask = tasks.filter(task => task !== deletedTask)
+    setTasks(filteredTask)
+    setDoneCounter(prevState => prevState - 1)
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -44,15 +52,13 @@ export function Home() {
           <EvilIcons name="plus" color="#fff" size={24} />
         </TouchableOpacity>
       </View>
-      <Info tasks={[]} />
+      <Info tasks={tasks} doneCounter={doneCounter} />
       <FlatList
         data={tasks}
         keyExtractor={(item) => item}
         contentContainerStyle={{ marginTop: 40 }}
         renderItem={({ item: task }) => (
-          <View>
-            <Text>{task}</Text>
-          </View>
+          <Task description={task} onDelete={handleDeleteTask} onChangeCounter={setDoneCounter} />
         )}
         ListEmptyComponent={() => (
           <View
